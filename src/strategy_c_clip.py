@@ -64,8 +64,10 @@ def get_frame_embeddings(frames, batch_size=32):
         ).to(device)
         
         with torch.no_grad():
-            embeddings = clip_model.get_image_features(**inputs)
-        
+            outputs = clip_model.vision_model(**inputs)
+            embeddings = outputs.pooler_output
+            embeddings = clip_model.visual_projection(embeddings)
+
         # Normalize embeddings
         embeddings = embeddings / embeddings.norm(dim=-1, keepdim=True)
         all_embeddings.append(embeddings.cpu().numpy())
